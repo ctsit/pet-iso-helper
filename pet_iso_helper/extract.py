@@ -18,7 +18,7 @@ def main(iso_source, zip_destination):
     """This program pulls the DICOM images from ISOs and creates a ZIP archive.
     """
     SOURCE_ISO_LOCATION = iso_source
-    ZIP_DESTINATION = zip_destination
+    ZIP_DESTINATION = zip_destination + '/'
 
     # Get a list of ISOs present in the source folder.
     try:
@@ -44,7 +44,7 @@ def main(iso_source, zip_destination):
         finally:
             unmount_iso(MOUNT_FOLDER)
 
-    click.secho(f"Zipped DICOM images are available at {ZIP_DESTINATION}", fg='red', bold=True)
+    click.secho(f"Zipped DICOM images are available at {ZIP_DESTINATION}", fg='yellow', bold=True)
 
 
 if __name__ == "__main__":

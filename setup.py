@@ -11,5 +11,6 @@ setup(
         pet-iso-helper=pet_iso_helper.extract:main
     ''',
     author='Vedprakash Pandey',
-    author_email='vedprakash2302@gmail.com'
+    author_email='vedprakash2302@gmail.com',
+    url='https://www.github.com/vedprakash2302'
 )

@@ -3,6 +3,8 @@ import platform
 import shutil
 import pydicom
 import datetime
+import click
+from subprocess import DEVNULL, STDOUT, check_call
 
 
 def get_list_of_iso(mount_path):
@@ -18,6 +20,9 @@ def get_list_of_iso(mount_path):
     for file in os.listdir(mount_path):
         if file.endswith(".iso"):
             list_of_iso.append(os.path.join(mount_path, file))
+        else:
+            click.secho(f"File {file} is not an ISO. Skipping file {file}...", fg='yellow', bold=True)
+
     return list_of_iso
 
 
@@ -30,15 +35,18 @@ def mount_iso(iso_path, mount_path):
 
     Returns:
         None
+
+        check_call(['hdiutil', 'mount', '-mountpoint', mount_path, iso_path], stdout=DEVNULL, stderr=STDOUT)
     """
+    click.secho(f"Mounting {iso_path} ...", fg='white')
     os.system(f"mkdir {mount_path}")
     if platform.system() == 'Darwin':
-        os.system(f"hdiutil mount -mountpoint {mount_path} {iso_path}")
+        check_call(['hdiutil', 'mount', '-mountpoint', mount_path, iso_path], stdout=DEVNULL, stderr=STDOUT)
     elif platform.system() == 'Linux':
         os.system(f"sudo mount -o loop {iso_path} {mount_path}")
 
 
-def extract_and_zip(mount_path):
+def extract_and_zip(mount_path, zip_destination):
     """Extracts the contents of passed ISO and zips it up
 
     Parameters:
@@ -48,9 +56,11 @@ def extract_and_zip(mount_path):
         None
     """
     dicom_folder_path, dicom_img = get_dicom(mount_path)
-    zip_filename = determine_filename(dicom_folder_path, dicom_img)
+    filename = determine_filename(dicom_folder_path, dicom_img)
+    zip_filename = zip_destination + filename
+    click.secho(f"Creating the archive {filename}.zip ...", fg='cyan')
     shutil.make_archive(zip_filename, 'zip', dicom_folder_path)
-    print("Zipped Successfully!")
+    click.secho(f"{filename}.zip created successfully!", fg='green')
 
 
 def determine_filename(dicom_folder_path, dicom_img):
@@ -67,8 +77,7 @@ def determine_filename(dicom_folder_path, dicom_img):
     formatted_study_date = datetime.datetime.strptime(img.StudyDate, '%Y%m%d').strftime('%m_%d_%Y')
     patient_name = img.PatientName
     filename = str(patient_name) + '_' + formatted_study_date
-    ZIP_DESTINATION = '/Users/v.pandey/Documents/DICOMS/zipped_dicoms/'
-    return ZIP_DESTINATION + filename
+    return filename
 
 
 def get_dicom(mount_path):
@@ -96,8 +105,9 @@ def unmount_iso(mount_path):
     Returns:
         None
     """
+    click.secho(f"Unmounting {mount_path} ...", fg='white')
     if platform.system() == 'Darwin':
-        os.system(f"hdiutil unmount {mount_path}")
+        check_call(['hdiutil', 'unmount', mount_path], stdout=DEVNULL, stderr=STDOUT)
     elif platform.system() == 'Linux':
         os.system(f"sudo unmount {mount_path}")
     os.system(f"rmdir {mount_path}")

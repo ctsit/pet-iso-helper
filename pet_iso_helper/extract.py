@@ -9,9 +9,15 @@ MOUNT_FOLDER = os.path.join(str(Path.home()), 'temp_mount')
 ZIP_DESTINATION = '/Users/v.pandey/Documents/DICOMS/zipped_dicoms/'
 
 
-def main():
+# Using click to get command line arguments
+@click.command()
+@click.argument('source')
+@click.argument('destination')
+def main(source, destination):
     """This is the entry point for the application.
     """
+    SOURCE_ISO_LOCATION = source
+    ZIP_DESTINATION = destination
     # Get a list of ISOs present in the source folder.
     list_of_iso = get_list_of_iso(SOURCE_ISO_LOCATION)
 

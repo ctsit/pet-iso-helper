@@ -45,7 +45,3 @@ def main(iso_source, zip_destination):
             unmount_iso(MOUNT_FOLDER)
 
     click.secho(f"Zipped DICOM images are available at {ZIP_DESTINATION}", fg='yellow', bold=True)
-
-
-if __name__ == "__main__":
-    main()
